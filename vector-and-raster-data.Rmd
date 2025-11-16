@@ -1,0 +1,128 @@
+---
+title: "Geographic Vector and Raster Data"
+author: "Patrick Leu"
+date: "2025-11-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# load required packages
+library(sf)
+library(raster)
+library(crsuggest)
+library(osmdata)
+library(cancensus)
+library(tidyverse)
+
+```
+
+## Vector Data
+
+Vector data are used to represent an object or feature that occurs somewhere on Earth and that has some kind of spatial geometry, i.e., it has a shape which can be represented by an (at least) two-dimensional coordinate that references a specific location on Earth.
+
+The `sf` package can be used to represent different types of geometries, the book takes a closer look on (1) points, (2) lines, and (3) polygons.
+
+```{r}
+
+# creating a single point
+point = st_point(x = c(1,2))
+
+# inspect attributes
+attributes(point)
+
+```
+The single point is a simple feature geometry (or `sfg`) object of type `POINT`, meaning that it stores x,y coordinate information and does not carry any information on the geographic coordinate system, datum, or projection associated with that point.
+
+
+```{r}
+
+# create multiple points 
+p1 = st_point(x = c(5,1))
+p2 = st_point(x = c(1,3))
+p3 = st_point(x = c(-1,4))
+p4 = st_point(x = c(3,5))
+p5 = st_point(x = c(4,-1))
+
+# can combine points to a "simple feature geometry column" via
+points = st_sfc(p1, p2, p3, p4, p5)
+
+# the points together now follow a certain coordinate reference system
+attributes(points)
+
+# plot
+plot(points)
+
+```
+
+However, a sfc cannot store any attributes associated with the feature. Instead, create a simple feature (sf) object which can have both location and attribute data
+
+```{r}
+
+# create some attribute (type of infrastructure)
+pt_attributes = tibble(
+  infrastructure = c(rep("bridge", 2), rep("bus station", 2), "park")
+  )
+
+# convert into sf object
+points_sf = st_sf(pt_attributes, geometry = points)
+
+# plot again
+plot(points_sf, pch = 16, key.width = lcm(4.5))
+
+```
+
+Lines can be created as the same objects as the points above but they follow the `linestring` geometry, which is built from a matrix.
+
+```{r}
+
+# generate some random matrix
+set.seed(1234)
+X = matrix(sample(rep(1:5, 5), 10), ncol = 2, nrow = 5)
+
+# create linestring sfg
+linie = st_linestring(X)
+
+# plot
+plot(linie, col = "dodgerblue3", lwd = 2, lty = 3)
+```
+
+```{r}
+
+# create more lines
+l1 = linie
+l2 = st_linestring(X-1)
+l3 = st_linestring(X[2:3, 1:2]-2)
+
+# combine to sfc
+lines = st_sfc(l1, l2, l3, crs = 4326)
+
+plot(lines)
+```
+
+
+## Raster Data
+
+
+```{r}
+
+
+```
+
+## Read Spatial Data
+
+```{r}
+
+
+```
+
+
+## Dynamic Maps with Mapview
+
+```{r}
+
+
+``` 
+
+
