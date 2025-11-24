@@ -87,19 +87,75 @@ linie = st_linestring(X)
 # plot
 plot(linie, col = "dodgerblue3", lwd = 2, lty = 3)
 ```
+Create an sfc with multiple lines and the coordinate reference system "World Geodetic System 1984" (WGS 1984).
 
 ```{r}
 
 # create more lines
 l1 = linie
-l2 = st_linestring(X-1)
-l3 = st_linestring(X[2:3, 1:2]-2)
+l2 = st_linestring(X-3)
+l3 = st_linestring(X-X[,2]+1)
 
 # combine to sfc
 lines = st_sfc(l1, l2, l3, crs = 4326)
 
 plot(lines)
 ```
+We can again assign attributes to the lines, e.g., the lines could represent different road types, and cars are only allowed on high ways.
+
+```{r}
+line_attr = data.frame(
+  raodt = c("bicycle road", "foot path", "high way"),
+  cars_allowed = c(0, 0, 1))
+
+lines_sf = st_sf(line_attr, geometry = lines)
+
+plot(lines_sf["raodt"])
+```
+Finally, polygons are basically linestrings, where the first and last vertex coincide, i.e, are on the same coordinate. The function `st_polygon()` takes a list as input which contains linestring matrices.
+
+```{r}
+
+# create a matrix with top and bottom column (1,1)
+set.seed(123)
+polym = rbind(c(1,1), matrix(sample(rep(1:6, 4), 10), ncol = 2), c(1,1))
+
+# create list
+polyl = list(polym)
+
+# to sfg
+polyg = st_polygon(polyl)
+
+plot(polyg, col = "dodgerblue3")
+```
+We can also create a hole in the polygon by creating another polygon that occurs within the first polygon, and adding it to the list. E.g., the first polygon could represent a lake and the "hole" an isle in it.
+
+```{r}
+
+# isle matrix
+isle = rbind(c(2.5, 3.5), c(3.5, 3.75), c(3, 3.25), c(2.5, 3.5))
+lake_isle = list(polym, isle)
+poly_lake_isle = st_polygon(lake_isle)
+plot(poly_lake_isle, col = "dodgerblue3")
+```
+Creating an sf wtih multiple polygons, say, multiple lakes on a high altitude plain.
+
+```{r}
+
+set.seed(123)
+lake2 = rbind(c(5,4), matrix(sample(rep(5:8, 4), 10), ncol = 2), c(5,4)) |> list() |> st_polygon()
+
+lake_attr = data.frame(depth = c("deep", "shallow"))
+
+lakes_sf = st_sf(lake_attr, geometry = st_sfc(poly_lake_isle, lake2, crs = 4326))
+
+plot(lakes_sf)
+
+```
+In summary, there are:
+1. `sfg` objects contain information about a single feature geometry.
+2. `sfc` objects contain multiple `sfg` objects and a coordinate reference system.
+3. `sf` objects store the respective attribute data to the geometry in sfc
 
 
 ## Raster Data
