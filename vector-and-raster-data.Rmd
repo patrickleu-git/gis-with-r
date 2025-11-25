@@ -160,10 +160,24 @@ In summary, there are:
 
 ## Raster Data
 
+Generally, raster data follow a grid structure with equally spaced cells. Each cell stores in input, which can correspond to categoric or numerical values. For example, it can represent elevation level, land cover type including urban sprawl, distribution of wealth by commune etc. 
+
+The crucial parameter is spatial resolution, i.e., the size of the cells constituting the grid. The higher the resolution, the smaller the individual cells.
+
+We can create a rectangular grid with each cell being 100mx100m in size that covers the area of Switzerland.
 
 ```{r}
 
+ch_raster <- raster(resolution=10000, #specify spatial resolution
+                     xmn=2450000, xmx=2850000, #specify extent from east to west in metres
+                     ymn=1050000, ymx=1300000, #specify extent from north to south in metres
+                     crs=2056) #set projection LV95 in EPSG
 
+# generate random values
+values(ch_raster) = rnorm(n = ncell(ch_raster))
+
+# plot the raster
+plot(ch_raster)
 ```
 
 ## Read Spatial Data
